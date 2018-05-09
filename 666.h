@@ -34,7 +34,6 @@ public slots:
     void PlayGame();    //恢复游戏
     void PauseGame();   //暂停游戏
     void SetSpeed(int level);//设置速度等级
-    //void SetHard(int level);//设置是否增加难度
     void GameOver();    //游戏结束
 public:
 
@@ -118,7 +117,6 @@ private:
     bool Startflag;//是否已经开始游戏
     QColor color1, color2;//方块颜色
     Ui::MainWindow *ui;
-    //Query *query;
 };
 
 #endif // MAINWINDOW_H

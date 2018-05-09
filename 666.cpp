@@ -9,23 +9,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     connect(this, &MainWindow::GameOverSignal, this, &MainWindow::GameOver);
-    //this->resize((SCENE_H+4)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
     SCENE_H = 10;  //场景列数
     SCENE_W = 20;  //场景行数
     REC_SIZE = 20; //方块大小
-    /*
-    for(int i=0;i<SCENE_W;i++)  //清空舞台信息
-        memset(scene_num[i],0,sizeof(int) * SCENE_H);
-        */
     ui->setupUi(this);
     Startflag = false;
     ui->menuSpeed->setTitle(tr("Speed: 0")); //设置标签信息
     this->resize((SCENE_H+SCENE_H/2)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
     ui->line->move((SCENE_H)*REC_SIZE,0);//移动分割线位置
     SetSpeed(0);//设置下落速度
-    //SetLevel(1);
     memset(scene_num,0,sizeof(scene_num));
-    //StartGame();  //开始游戏
 }
 
 MainWindow::~MainWindow()
@@ -40,20 +33,6 @@ void MainWindow::StartGame()       //初始化
     ui->actionStart_S->setText(tr("New Game"));
     ui->label_3->setText(tr("Level :  0"));
     ui->scoreLCD->display(score);
-//    this->resize((SCENE_H)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
-    /***************/
-    /*
-     * ui->line->setLineWidth((SCENE_W+0)*REC_SIZE+100);
-    ui->line->move((SCENE_H)*REC_SIZE,0);//移动分割线位置
-    //ui->label->
-    ui->label->setText(tr("Score"));//设置label的文字
-    ui->label->move((SCENE_H)*REC_SIZE+6,(SCENE_W+0)*REC_SIZE-70);//移动label的位置
-    ui->label_2->setText(QString::number(score));//设置label的文字
-    ui->label_2->move((SCENE_H)*REC_SIZE+6,(SCENE_W+0)*REC_SIZE-50);//移动label的位置
-    for(int i=0;i<SCENE_W;i++)  //清空舞台信息
-        memset(scene_num[i],0,sizeof(int) * SCENE_H);
-        */
-    /***************/
     ui->label_2->setText("");//设置label的文字
     ui->label->setText("");//设置label的文字
     score = 0; //分数初始化
@@ -71,10 +50,8 @@ void MainWindow::StartGame()       //初始化
     srand(time(0));
     REC_tx[0] = (qrand()%1000)%7;
     REC_tx[1] = (qrand()%1000)%7;//随机出现第一个图形
-    //change(3,SCENE_H+3,tx_code[REC_tx[1]][0],2);
     change(rpoint[0][0].pos_x,rpoint[0][0].pos_y,tx_code[REC_tx[0]][0],2);
     Pauseflag = false;
-    //Levelflag=false;
     SetSpeed(0);
     PlayGame();//开始下落
 }
@@ -138,15 +115,12 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
     static int temp_tx;
     bool temp_flag;
     temp_flag = true;
-
     switch(direct) {
 
     case UP: //变换方块动作
-        /**/
         REC_Point tmppoint[4];
         memcpy(tmppoint,rpoint[0],sizeof(tmppoint));//复制当前方块位置信息
         trychange(x,y,tx_code[tx][(temp_tx+1)%4],tmppoint);//对方块进行模拟变换
-        /**/
         for(int i=0;i<4;i++)        //判断方块是否允许变换
             temp_flag = temp_flag
                     && tmppoint[i].pos_y >= 0
@@ -180,25 +154,6 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
                         move(i,DOWN);//从第i行开始整体下移
                         score += score_add;
                         score_add += SCENE_H/2;
-                        /*
-                        int tmp = score, cnt = 0;
-                        char str[17];
-                        while(tmp) {
-                            str[cnt++] = tmp%10 + '0';
-                            tmp /= 10;
-                        }
-                        str[cnt] = '\0';
-                        for(int p=0, q=cnt-1 ; p<q ; p++,q--) {
-                            char temp = str[p];
-                            str[p] = str[q];
-                            str[q] = temp;
-                        }
-                        */
-                        //ui->label_2->setText(QString::number(score));//设置label的文字
-                        //ui->menuScore->setTitle(QString::number(score));
-                        //emit CurrentScore();
-
-                        /*******/ //难度判定与处理
                         if(!uselevel[5]) { //开始难度判定
                             if(!uselevel[5]&&score>=50 * SCENE_H) {
                                 SetLevel(5);
@@ -239,8 +194,6 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
                         if(Levelflag) {
                             UseLevel();
                         }
-                        /*******/
-//                        this->setWindowTitle(QString::number(score));
                         ui->scoreLCD->display(score);
                         break;
                     }
@@ -253,13 +206,6 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
                 emit GameOverSignal();
                 break;
             }
-            /*
-            //判断是否加难度
-            if(Levelflag){
-                SetLevel();
-                Levelflag=false;
-            }
-            */
             //重新构造一个方块
             rpoint[0][0].pos_x = 1;rpoint[0][0].pos_y = SCENE_H/2;//设置主方块位置信息
             REC_tx[0]=REC_tx[1];//随机出现第一个图形
@@ -293,12 +239,8 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
             if(temp_flag){              //执行下移动作
                 clear(x+j,y,tx_code[tx][temp_tx]);
                 change(x+j+1,y,tx_code[tx][temp_tx],2);
-                //change(x+j+1,y,tx_code[tx][temp_tx],1);
-                //tempx = x+j+1;
             }else break;
         }
-        //落下后更改状态为静止
-        //change(tempx,y,tx_code[tx][temp_tx],1);
         break;
     }
 }
@@ -325,7 +267,6 @@ void MainWindow::timerEvent(QTimerEvent *event)
 {
     if(!Pauseflag && timerid1==event->timerId()){
         weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],DOWN);//下移
-        //ui->scoreLCD->display(score);
     }
     if(!Pauseflag && timerid2==event->timerId())  this->update(); //刷新绘图
 }
@@ -360,26 +301,8 @@ void MainWindow::move(int row, direction direct)
     }
 }
 
-/*
-void MainWindow::SetHard(int level)
-{
-    Levelflag = true;
-    SetLevel();
-}
-*/
-
 void MainWindow::GameOver()
 {
-    /*
-    if(score > MaxScore)
-        QMessageBox::about(this, "New High Score",
-                           QString("<p align='center'>Unbelievable!\n</p><p align='center'>Your score is : ")
-                           + QString::number(score) + QString("</p>"));
-    else
-        QMessageBox::about(this, "GameOver",
-                           QString("<p align='center'>Your score is : ")
-                           + QString::number(score) + QString("</p>"));
-        */
     QMessageBox::about(this, "GameOver",
                        QString("<p align='center'>Your score is : ")
                        + QString::number(score) + QString("</p>"));
@@ -442,7 +365,6 @@ void MainWindow::on_actionStart_S_triggered()
 {
     StartGame();
 }
-/************/
 //设置下落速度
 void MainWindow::on_action1_triggered()
 {
@@ -493,21 +415,6 @@ void MainWindow::on_action5_triggered()
             PlayGame();
         }
 }
-/************/
-
-/*
-void MainWindow::on_actionRow_Column_triggered()
-{
-    //QMessageBox::about(this,"Hello World!","Hello World!");
-    //query = new Query;
-    QDialog *query = new QDialog;
-    query->setWindowTitle("Enter the Width and Height");
-    QLineEdit *WidthLineEdit = new QLineEdit, *HeightLineEdit = new QLineEdit;//宽和高编辑器
-    query->setLayout();
-    query->show();
-    //QLineEdit *WidthLineEdit = new QLineEdit, *HeightLineEdit = new QLineEdit;//宽和高编辑器
-}
-*/
 void MainWindow::on_action1_2_triggered()
 {
     SetLevel(1);
