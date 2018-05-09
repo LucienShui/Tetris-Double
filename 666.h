@@ -43,8 +43,6 @@ public:
     void deleteById(int id);  //删除
     //void sortById();          //排序
     void updateAll();//将数据库里的内容清空，并对ranklisk进行按score的从大到小排序，然后写入数据库
-private:
-    int rankcnt;
 };
 
 class MainWindow : public QMainWindow {
@@ -107,6 +105,8 @@ private slots:
     void on_actionAbout_triggered();
 
     void on_actionHow_to_Play_triggered();
+
+    void on_actionRankList_triggered();
 
 private:
     int MaxScore; //历史最高分数

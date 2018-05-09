@@ -4,7 +4,6 @@
 //图形代码
 int tx_code[][4]={{456,258,456,258},{142,142,142,142},{246,268,123,248},{128,467,289,346},
                   {238,146,278,469},{247,126,247,126},{269,234,269,234}};
-
 struct RANK{
     int rank,score;
     QString name;
@@ -12,7 +11,7 @@ struct RANK{
         return score > tmp.score;
     }
 }ranklist[7];
-
+int rankcnt = 0;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -31,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     db.createConnection();
     db.createTable();
     db.queryAll();
+    //rankcount = 0;
 }
 
 MainWindow::~MainWindow()
@@ -193,24 +193,24 @@ void MainWindow::position(int x,int y,int tx,direction direct)
                          */
                         if(!uselevel[5]) { //开始难度判定
                             if(!uselevel[5]&&score>=50 * SCENE_H) {
-                                SetLevel(5);
+                                SetLevel(1);
                                 ui->levelLCD->display(6);
                                 uselevel[5] = true;
                             }
                             else if(!uselevel[4]&&score>=32 * SCENE_H) {
-                                SetLevel(4);
+                                SetLevel(1);
                                 SetSpeed(4);
                                 ui->levelLCD->display(5);
                                 uselevel[4] = true;
                             }
                             else if(!uselevel[3]&&score>=15 * SCENE_H) {
-                                SetLevel(3);
+                                SetLevel(1);
                                 SetSpeed(3);
                                 ui->levelLCD->display(4);
                                 uselevel[3] = true;
                             }
                             else if(!uselevel[2]&&score>=8 * SCENE_H) {
-                                SetLevel(2);
+                                SetLevel(1);
                                 SetSpeed(2);
                                 ui->levelLCD->display(3);
                                 uselevel[2] = true;
@@ -338,9 +338,26 @@ void MainWindow::move(int row, direction direct)
 }
 void MainWindow::GameOver()
 {
-    QMessageBox::about(this, "GameOver",
-                       QString("<p align='center'>Your score is : ")
-                       + QString::number(score) + QString("</p>"));
+    bool isOK;
+    QString text = QInputDialog::getText(NULL, "Game Over",
+                                         QString("<p align='center'>Your score is : ")
+                                         + QString::number(score)
+                                         + QString("</p>")+QString("\n<p align='center'>Please input your username: ")
+                                         ,QLineEdit::Normal
+                                         ,"Anonymous",&isOK);
+    if(isOK) {
+           QMessageBox::information(NULL, "Information",
+                                               "Your comment is: <b>" + text + "</b>",
+                                               QMessageBox::Yes | QMessageBox::No,
+                                               QMessageBox::Yes);
+
+    }
+    ranklist[6].name = text;
+    ranklist[6].score = score;
+    rankcnt++;
+    db.updateAll();
+    db.queryAll();
+    on_actionRankList_triggered();
     Startflag = false;
 }
 
@@ -487,6 +504,7 @@ void MainWindow::on_actionHow_to_Play_triggered()
     QMessageBox::about(this,"How to Play","Press Enter to start!\nClear a line to get 10 points\nEvery extra line for 5 points!");
 }
 
+
 /*****************/
 
 //DataBase:
@@ -519,22 +537,31 @@ void DataBase::insert(int i, QString Name, int Score)
     query.bindValue(0, i);
     query.bindValue(1, Name);
     query.bindValue(2, Score);
-    rankcnt++;
+    //rankcnt++;
     query.exec();
 }
 
 int cmp(const void *a, const void *b) {
-    return ((RANK*)b)->score - ((RANK*)a)->score;
+    char *tempa, *tempb;
+    QByteArray tmpa = (*((RANK*)a)).name.toLatin1();
+    tempa = tmpa.data();
+    QByteArray tmpb = (*((RANK*)b)).name.toLatin1();
+    tempb = tmpb.data();
+    if((*((RANK*)b)).score == (*((RANK*)a)).score)
+        return strcmp(tempb,tempa);
+    return (*((RANK*)b)).score - (*((RANK*)a)).score;
 }
 
 void DataBase::updateAll() {
     for(int i=0 ; i<=6 ; i++) {
         deleteById(i);
     }
-    qsort(ranklist+1,5,sizeof(ranklist[0]),cmp);
+    qsort(ranklist,7,sizeof(ranklist[0]),cmp);
     //sort(ranklist+1,ranklist+1+rankcnt);
     rankcnt = rankcnt<5 ? rankcnt : 5;
-    for(int i=1 ; i<=rankcnt ; i++) {
+    //qDebug() << rankcnt;
+    for(int i=0 ; i<rankcnt ; i++) {
+        //qDebug() << ranklist[i].name << " " << ranklist[i].score;
         insert(i,ranklist[i].name,ranklist[i].score);
     }
 }
@@ -554,14 +581,16 @@ void DataBase::queryAll()
         id = query.value(0).toInt();
         name = query.value(1).toString();
         scr = query.value(2).toInt();
-        ranklist[++rankcnt].rank = id;
+        ranklist[rankcnt].rank = id;
         ranklist[rankcnt].name = name;
-        ranklist[rankcnt].score = scr;
-        //qDebug() << "id = " << id << " name = " << name << " score = " << score;
+        ranklist[rankcnt++].score = scr;
+//        qDebug() << "id = " << id << " name = " << name << " score = " << score;
     }
-    for(int i=1 ; i<=rankcnt ; i++) {
+    /*
+    for(int i=0 ; i<rankcnt ; i++) {
         qDebug() << ranklist[i].rank << " " << ranklist[i].name << " " << ranklist[i].score;
     }
+    */
 }
 
 //根据ID删除记录
@@ -573,33 +602,13 @@ void DataBase::deleteById(int id)
     query.exec();
 }
 
-/*
-//根据ID更新记录
-void DataBase::updateById(int id,QString Name, int Score)
+
+void MainWindow::on_actionRankList_triggered()
 {
-    QSqlDatabase db = QSqlDatabase::database("sqlite1"); //建立数据库连接
-    QSqlQuery query(db);
-    query.prepare(QString("update rank set Name=?,Score=? where id=%1").arg(id));
-
-     query.bindValue(0,Name);
-     query.bindValue(1,Score);
-
-     query.exec();
+    QString temp = "";
+    rankcnt = rankcnt < 5 ? rankcnt : 5;
+    for(int i=0 ; i<rankcnt ; i++) {
+        temp = temp + "\n" + QString::number(i+1) + "  " + ranklist[i].name + "  " + QString::number(ranklist[i].score);
+    }
+    QMessageBox::about(this,"RankList",temp);
 }
-
-
-//排序
-void DataBase::sortById()
-{
-    QSqlDatabase db = QSqlDatabase::database("sqlite1"); //建立数据库连接
-    QSqlQuery query(db);
-    query.exec("select * from rank order by score desc");
-}
-*/
-
-
-
-
-
-
-/*****************/
