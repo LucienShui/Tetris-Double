@@ -99,6 +99,7 @@ private:
     bool Pauseflag;//暂停标志
     bool Levelflag;//随机行标记
     bool Startflag;//是否已经开始游戏
+    QColor color1, color2;//方块颜色
     Ui::MainWindow *ui;
     //Query *query;
 };

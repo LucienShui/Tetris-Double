@@ -156,26 +156,26 @@
      <property name="title">
       <string>Color</string>
      </property>
-     <widget class="QMenu" name="menuBlue">
+     <widget class="QMenu" name="menuColor_1">
       <property name="title">
-       <string>Blue</string>
+       <string>Red</string>
       </property>
       <addaction name="actionRed"/>
       <addaction name="actionYellow_2"/>
       <addaction name="actionBlue_2"/>
       <addaction name="actionGreen"/>
      </widget>
-     <widget class="QMenu" name="menuRed">
+     <widget class="QMenu" name="menuColor_2">
       <property name="title">
-       <string>Red</string>
+       <string>Blue</string>
       </property>
       <addaction name="actionRed_2"/>
       <addaction name="actionYellow_3"/>
       <addaction name="actionBlue_3"/>
       <addaction name="actionGreen_2"/>
      </widget>
-     <addaction name="menuBlue"/>
-     <addaction name="menuRed"/>
+     <addaction name="menuColor_1"/>
+     <addaction name="menuColor_2"/>
     </widget>
     <addaction name="menuSpeed"/>
     <addaction name="separator"/>

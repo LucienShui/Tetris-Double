@@ -55,7 +55,8 @@ void MainWindow::StartGame()       //初始化
     ui->label_2->setText("");//设置label的文字
     ui->label->setText("");//设置label的文字
     score = 0; //分数初始化
-    fresh_ms = 1;//设置刷新速度
+    fresh_ms = 100;//设置刷新速度
+    color1 = Qt::red, color2 = Qt::blue;
     memset(scene_num,0,sizeof(scene_num));//清空舞台信息
     if(Levelflag) UseLevel();//设置等级并消除等级标记
     rpoint[0].pos_x = 1;
@@ -63,6 +64,7 @@ void MainWindow::StartGame()       //初始化
     srand(time(0));
     REC_tx[0] = (qrand()%1000)%7;
     REC_tx[1] = (qrand()%1000)%7;//随机出现第一个图形
+    //change(3,SCENE_H+2,tx_code[REC_tx[1]][0],2);
     change(rpoint[0].pos_x,rpoint[0].pos_y,tx_code[REC_tx[0]][0],2);
     Pauseflag = false;
     //Levelflag=false;
@@ -104,15 +106,27 @@ void MainWindow::clear(int x, int y, int num)     //清除上次位置信息
 void MainWindow::weizhi(int x,int y,int tx,direction direct)
 {                           //x,y是坐标,tx是7种形状，direct是方向
     if(Startflag==false || Pauseflag == true) return ;
-    static int temp_tx;bool temp_flag;    temp_flag = true;
-    switch(direct){
+
+    static int temp_tx;
+    bool temp_flag;
+    temp_flag = true;
+
+    switch(direct) {
+
     case UP: //变换方块动作
         for(int i=0;i<4;i++)        //判断方块是否允许变换
-            temp_flag = temp_flag && rpoint[i].pos_y-1 >= 0 && rpoint[i].pos_x+1 < SCENE_W-1
-                        && rpoint[i].pos_x+1 != 1 && rpoint[i].pos_y+1 < SCENE_H ;
+            temp_flag = temp_flag
+                    && rpoint[i].pos_y-1 >= 0
+                    && rpoint[i].pos_x+1 < SCENE_W-1
+                    && rpoint[i].pos_x+1 != 1
+                    && rpoint[i].pos_y+1 < SCENE_H ;
         if(temp_flag){              //执行变换动作
-            clear(x,y,tx_code[tx][temp_tx++]);if(temp_tx >= 4) temp_tx = 0;change(x,y,tx_code[tx][temp_tx],2);
+            clear(x,y,tx_code[tx][temp_tx++]);
+            if(temp_tx >= 4)
+                temp_tx = 0;
+            change(x,y,tx_code[tx][temp_tx],2);
         }break;
+
     case DOWN://下移
         for(int i=0;i<4;i++)        //判断是否允许下移
             temp_flag = temp_flag && scene_num[rpoint[i].pos_x+1][rpoint[i].pos_y] !=1 &&
@@ -220,28 +234,38 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
             temp_tx = 0;
         }
         break;
+
     case LEFT://左移
         for(int i=0;i<4;i++)        //判断是否允许左移
             temp_flag = temp_flag && scene_num[rpoint[i].pos_x][rpoint[i].pos_y-1] !=1 && rpoint[i].pos_y-1 >=0;
         if(temp_flag){              //执行左移动作
         clear(x,y,tx_code[tx][temp_tx]);change(x,y-1,tx_code[tx][temp_tx],2);
         }break;
+
     case RIGHT://右移
         for(int i=0;i<4;i++)        //判断是否允许右移
             temp_flag = temp_flag && scene_num[rpoint[i].pos_x][rpoint[i].pos_y+1] !=1 && rpoint[i].pos_y+1 < SCENE_H;
         if(temp_flag){              //执行右移动作
         clear(x,y,tx_code[tx][temp_tx]);change(x,y+1,tx_code[tx][temp_tx],2);
         }break;
+
     case SPACE://快速下移
+        int tempx;
         for(int j=0;j<SCENE_W;j++){
             for(int i=0;i<4;i++)        //判断是否允许下移
                 temp_flag = temp_flag && scene_num[rpoint[i].pos_x+1][rpoint[i].pos_y] !=1 &&
-                            scene_num[rpoint[i].pos_x][rpoint[i].pos_y] !=1 && rpoint[i].pos_x+1 < SCENE_W;
+                            scene_num[rpoint[i].pos_x][rpoint[i].pos_y] !=1 &&
+                        rpoint[i].pos_x+1 < SCENE_W;
             if(temp_flag){              //执行下移动作
-                clear(x+j,y,tx_code[tx][temp_tx]);change(x+j+1,y,tx_code[tx][temp_tx],2);
-            }else
-                break;
-        }break;
+                clear(x+j,y,tx_code[tx][temp_tx]);
+                change(x+j+1,y,tx_code[tx][temp_tx],2);
+                //change(x+j+1,y,tx_code[tx][temp_tx],1);
+                tempx = x+j+1;
+            }else break;
+        }
+        //落下后更改状态为静止
+        change(tempx,y,tx_code[tx][temp_tx],1);
+        break;
     }
 }
 
@@ -251,13 +275,13 @@ void MainWindow::paintEvent(QPaintEvent */*event*/)
     QPainter painter(this);
     //刷新舞台
     for(int i=0;i<SCENE_W;i++){
-        for(int j=0;j<SCENE_H;j++){
+        for(int j=0;j<SCENE_H+5;j++){
             if(scene_num[i][j] == 1){
-                painter.setBrush(QBrush(Qt::blue,Qt::SolidPattern));
+                painter.setBrush(QBrush(color2,Qt::SolidPattern));
                 painter.drawRect(j*REC_SIZE,i*REC_SIZE,REC_SIZE,REC_SIZE);
             }
             else if(scene_num[i][j] > 1){
-                painter.setBrush(QBrush(Qt::red,Qt::SolidPattern));
+                painter.setBrush(QBrush(color1,Qt::SolidPattern));
                 painter.drawRect(j*REC_SIZE,i*REC_SIZE,REC_SIZE,REC_SIZE);
             }
         }
