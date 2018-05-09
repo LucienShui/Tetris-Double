@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>500</height>
+    <width>300</width>
+    <height>400</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>300</width>
+    <height>400</height>
+   </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>16777215</width>
-    <height>16777214</height>
+    <width>300</width>
+    <height>400</height>
    </size>
   </property>
   <property name="cursor">
@@ -32,9 +38,9 @@
    <widget class="Line" name="line">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>203</x>
       <y>-10</y>
-      <width>3</width>
+      <width>7</width>
       <height>10086</height>
      </rect>
     </property>
@@ -51,8 +57,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>65</x>
-      <y>145</y>
+      <x>75</x>
+      <y>173</y>
       <width>70</width>
       <height>16</height>
      </rect>
@@ -64,8 +70,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>162</y>
+      <x>40</x>
+      <y>190</y>
       <width>140</width>
       <height>16</height>
      </rect>
@@ -88,13 +94,13 @@
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>140</y>
+      <y>160</y>
       <width>60</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Level :  1</string>
+     <string>Level ：</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -110,14 +116,24 @@
      <string>Score :</string>
     </property>
    </widget>
+   <widget class="QLCDNumber" name="levelLCD">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>180</y>
+      <width>80</width>
+      <height>30</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>500</width>
-     <height>28</height>
+     <width>300</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGame_G">

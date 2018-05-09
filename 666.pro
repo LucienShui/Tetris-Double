@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-
+QT       += sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = test
@@ -32,3 +32,7 @@ HEADERS += \
 
 FORMS += \
     666.ui
+
+RESOURCES += \
+    icon.qrc
+ICON = game.icns

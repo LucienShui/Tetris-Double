@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>game.png</file>
+        <file>white.jpg</file>
+    </qresource>
+</RCC>

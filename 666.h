@@ -8,6 +8,16 @@
 #include <QPaintEvent>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QTime>
+#include <QDebug>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QTime>
+#include <QSqlDriver>
+#include <QSqlRecord>
+#include <algorithm>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -22,6 +32,21 @@ namespace Ui {
 class MainWindow;
 }
 
+class DataBase
+{
+public:
+    void createConnection();  //创建一个连接
+    void createTable();       //创建数据库表
+    void insert(int i, QString Name, int Score);            //插入数据
+    void queryAll();          //查询数据库中数据数量并记录在rankcnt中，同时将所有的数据存入结构体ranklist中
+    void updateById(int id,QString Name, int Score);  //更新
+    void deleteById(int id);  //删除
+    //void sortById();          //排序
+    void updateAll();//将数据库里的内容清空，并对ranklisk进行按score的从大到小排序，然后写入数据库
+private:
+    int rankcnt;
+};
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -34,12 +59,13 @@ public slots:
     void PlayGame();    //恢复游戏
     void PauseGame();   //暂停游戏
     void SetSpeed(int level);//设置速度等级
+    //void SetHard(int level);//设置是否增加难度
     void GameOver();    //游戏结束
 public:
 
     explicit MainWindow(QWidget *parent = 0); //构造函数
     ~MainWindow(); //析构函数
-    void weizhi(int x,int y,int tx,direction direct); //位置变换
+    void position(int x,int y,int tx,direction direct); //位置变换
     void paintEvent(QPaintEvent *);  //场景绘制
     void trychange(int x,int y,int num,REC_Point temppoint[4]);
     void change(int x,int y,int num,int state);     //方块变换
@@ -82,22 +108,6 @@ private slots:
 
     void on_actionHow_to_Play_triggered();
 
-    void on_actionRed_triggered();
-
-    void on_actionYellow_2_triggered();
-
-    void on_actionBlue_2_triggered();
-
-    void on_actionGreen_triggered();
-
-    void on_actionRed_2_triggered();
-
-    void on_actionYellow_3_triggered();
-
-    void on_actionBlue_3_triggered();
-
-    void on_actionGreen_2_triggered();
-
 private:
     int MaxScore; //历史最高分数
     int HardLevel;//难度等级
@@ -116,7 +126,9 @@ private:
     bool Levelflag;//随机行标记
     bool Startflag;//是否已经开始游戏
     QColor color1, color2;//方块颜色
+    DataBase bd;
     Ui::MainWindow *ui;
+    //Query *query;
 };
 
 #endif // MAINWINDOW_H
