@@ -126,7 +126,7 @@ private:
     bool Levelflag;//随机行标记
     bool Startflag;//是否已经开始游戏
     QColor color1, color2;//方块颜色
-    DataBase bd;
+    DataBase db;
     Ui::MainWindow *ui;
     //Query *query;
 };

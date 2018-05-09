@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->line->move((SCENE_H)*REC_SIZE,0);  //移动分割线位置
     SetSpeed(0);  //设置下落速度
     memset(scene_num,0,sizeof(scene_num));
+    db.createConnection();
+    db.createTable();
 }
 
 MainWindow::~MainWindow()
