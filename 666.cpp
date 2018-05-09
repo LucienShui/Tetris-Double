@@ -542,3 +542,43 @@ void MainWindow::on_actionHow_to_Play_triggered()
 {
     QMessageBox::about(this,"How to Play","666");
 }
+
+void MainWindow::on_actionRed_triggered()
+{
+    color1  = Qt::red;
+}
+
+void MainWindow::on_actionYellow_2_triggered()
+{
+    color1 = Qt::yellow;
+}
+
+void MainWindow::on_actionBlue_2_triggered()
+{
+    color1 = Qt::blue;
+}
+
+void MainWindow::on_actionGreen_triggered()
+{
+    color1 = Qt::green;
+}
+
+void MainWindow::on_actionRed_2_triggered()
+{
+    color2 = Qt::red;
+}
+
+void MainWindow::on_actionYellow_3_triggered()
+{
+    color2 = Qt::yellow;
+}
+
+void MainWindow::on_actionBlue_3_triggered()
+{
+    color2 = Qt::blue;
+}
+
+void MainWindow::on_actionGreen_2_triggered()
+{
+    color2 = Qt::green;
+}

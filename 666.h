@@ -83,6 +83,22 @@ private slots:
 
     void on_actionHow_to_Play_triggered();
 
+    void on_actionRed_triggered();
+
+    void on_actionYellow_2_triggered();
+
+    void on_actionBlue_2_triggered();
+
+    void on_actionGreen_triggered();
+
+    void on_actionRed_2_triggered();
+
+    void on_actionYellow_3_triggered();
+
+    void on_actionBlue_3_triggered();
+
+    void on_actionGreen_2_triggered();
+
 private:
     int MaxScore; //历史最高分数
     int HardLevel;//难度等级
