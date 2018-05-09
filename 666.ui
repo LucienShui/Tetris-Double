@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
-    <height>480</height>
+    <width>500</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -32,10 +32,10 @@
    <widget class="Line" name="line">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>200</x>
       <y>-10</y>
       <width>3</width>
-      <height>471</height>
+      <height>10086</height>
      </rect>
     </property>
     <property name="baseSize">
@@ -51,10 +51,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>210</y>
+      <x>65</x>
+      <y>145</y>
       <width>70</width>
-      <height>17</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -64,10 +64,10 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>86</x>
-      <y>230</y>
+      <x>30</x>
+      <y>162</y>
       <width>140</width>
-      <height>17</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -77,20 +77,20 @@
    <widget class="QLCDNumber" name="scoreLCD">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>210</x>
       <y>100</y>
-      <width>121</width>
-      <height>71</height>
+      <width>80</width>
+      <height>30</height>
      </rect>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>180</y>
-      <width>67</width>
-      <height>17</height>
+      <x>220</x>
+      <y>140</y>
+      <width>60</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -100,10 +100,10 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>220</x>
       <y>80</y>
-      <width>67</width>
-      <height>17</height>
+      <width>60</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -116,7 +116,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>544</width>
+     <width>500</width>
      <height>28</height>
     </rect>
    </property>

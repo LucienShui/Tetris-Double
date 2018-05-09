@@ -10,8 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     connect(this, &MainWindow::GameOverSignal, this, &MainWindow::GameOver);
     //this->resize((SCENE_H+4)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
-    SCENE_H = 15;  //场景列数
-    SCENE_W = 24;  //场景行数
+    SCENE_H = 10;  //场景列数
+    SCENE_W = 20;  //场景行数
     REC_SIZE = 20; //方块大小
     /*
     for(int i=0;i<SCENE_W;i++)  //清空舞台信息
@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     Startflag = false;
     ui->menuSpeed->setTitle(tr("Speed: 0")); //设置标签信息
-//    this->resize((SCENE_H)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
+    this->resize((SCENE_H+SCENE_H/2)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
+    ui->line->move((SCENE_H)*REC_SIZE,0);//移动分割线位置
     SetSpeed(0);//设置下落速度
     //SetLevel(1);
     memset(scene_num,0,sizeof(scene_num));
@@ -38,6 +39,7 @@ void MainWindow::StartGame()       //初始化
     memset(uselevel,false,sizeof(uselevel));
     ui->actionStart_S->setText(tr("New Game"));
     ui->label_3->setText(tr("Level :  0"));
+    ui->scoreLCD->display(score);
 //    this->resize((SCENE_H)*REC_SIZE,(SCENE_W+0)*REC_SIZE);  //设置窗口大小
     /***************/
     /*
@@ -56,37 +58,63 @@ void MainWindow::StartGame()       //初始化
     ui->label->setText("");//设置label的文字
     score = 0; //分数初始化
     fresh_ms = 100;//设置刷新速度
+    ui->scoreLCD->display(score);//显示分数
     color1 = Qt::red, color2 = Qt::blue;
     memset(scene_num,0,sizeof(scene_num));//清空舞台信息
     if(Levelflag) UseLevel();//设置等级并消除等级标记
-    rpoint[0].pos_x = 1;
-    rpoint[0].pos_y = SCENE_H/2;//设置主方块位置信息
+    else {
+        SetLevel(0);
+        UseLevel();
+    }
+    rpoint[0][0].pos_x = 1;
+    rpoint[0][0].pos_y = SCENE_H/2;//设置主方块位置信息
     srand(time(0));
     REC_tx[0] = (qrand()%1000)%7;
     REC_tx[1] = (qrand()%1000)%7;//随机出现第一个图形
-    //change(3,SCENE_H+2,tx_code[REC_tx[1]][0],2);
-    change(rpoint[0].pos_x,rpoint[0].pos_y,tx_code[REC_tx[0]][0],2);
+    //change(3,SCENE_H+3,tx_code[REC_tx[1]][0],2);
+    change(rpoint[0][0].pos_x,rpoint[0][0].pos_y,tx_code[REC_tx[0]][0],2);
     Pauseflag = false;
     //Levelflag=false;
+    SetSpeed(0);
     PlayGame();//开始下落
+}
+
+void MainWindow::trychange(int x, int y, int num, REC_Point tmppoint[4]) //对方块进行模拟变换
+{
+    int temp = num;
+    for(int i=1;i<4;i++){
+         tmppoint[i].pos_x=x-1+(num%10-1)/3;
+         tmppoint[i].pos_y=y-1+(num%10-1)%3;
+         num = num/10;
+     }
+    tmppoint[0].pos_x = x;
+    tmppoint[0].pos_y = y;
+    if(258 == temp){
+         tmppoint[2].pos_x=x+2;
+         tmppoint[2].pos_y=y;
+     }
+    else if(456 == temp){
+         tmppoint[2].pos_x=x;
+         tmppoint[2].pos_y=y+2;
+     }
 }
 
 void MainWindow::change(int x, int y, int num,int state)        //设置本次位置信息
 {
    int temp = num;
    for(int i=1;i<4;i++){
-        rpoint[i].pos_x=x-1+(num%10-1)/3;
-        rpoint[i].pos_y=y-1+(num%10-1)%3;
-        scene_num[rpoint[i].pos_x][rpoint[i].pos_y]=state;
+        rpoint[0][i].pos_x=x-1+(num%10-1)/3;
+        rpoint[0][i].pos_y=y-1+(num%10-1)%3;
+        scene_num[rpoint[0][i].pos_x][rpoint[0][i].pos_y]=state;
         num = num/10;
     }
    scene_num[x][y]=state;
-   rpoint[0].pos_x = x;rpoint[0].pos_y = y;
+   rpoint[0][0].pos_x = x;rpoint[0][0].pos_y = y;
    if(258 == temp){
-        scene_num[x+2][y]=state;rpoint[2].pos_x=x+2;rpoint[2].pos_y=y;
+        scene_num[x+2][y]=state;rpoint[0][2].pos_x=x+2;rpoint[0][2].pos_y=y;
     }
    else if(456 == temp){
-        scene_num[x][y+2]=state;rpoint[2].pos_x=x;rpoint[2].pos_y=y+2;
+        scene_num[x][y+2]=state;rpoint[0][2].pos_x=x;rpoint[0][2].pos_y=y+2;
     }
 }
 
@@ -114,12 +142,18 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
     switch(direct) {
 
     case UP: //变换方块动作
+        /**/
+        REC_Point tmppoint[4];
+        memcpy(tmppoint,rpoint[0],sizeof(tmppoint));//复制当前方块位置信息
+        trychange(x,y,tx_code[tx][(temp_tx+1)%4],tmppoint);//对方块进行模拟变换
+        /**/
         for(int i=0;i<4;i++)        //判断方块是否允许变换
             temp_flag = temp_flag
-                    && rpoint[i].pos_y-1 >= 0
-                    && rpoint[i].pos_x+1 < SCENE_W-1
-                    && rpoint[i].pos_x+1 != 1
-                    && rpoint[i].pos_y+1 < SCENE_H ;
+                    && tmppoint[i].pos_y >= 0
+                    && tmppoint[i].pos_x < SCENE_W-1
+                    && tmppoint[i].pos_x != 0
+                    && tmppoint[i].pos_y < SCENE_H
+                    && scene_num[tmppoint[i].pos_x][tmppoint[i].pos_y]!=1;
         if(temp_flag){              //执行变换动作
             clear(x,y,tx_code[tx][temp_tx++]);
             if(temp_tx >= 4)
@@ -129,8 +163,8 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
 
     case DOWN://下移
         for(int i=0;i<4;i++)        //判断是否允许下移
-            temp_flag = temp_flag && scene_num[rpoint[i].pos_x+1][rpoint[i].pos_y] !=1 &&
-                        scene_num[rpoint[i].pos_x][rpoint[i].pos_y] !=1 && rpoint[i].pos_x+1 < SCENE_W;
+            temp_flag = temp_flag && scene_num[rpoint[0][i].pos_x+1][rpoint[0][i].pos_y] !=1 &&
+                        scene_num[rpoint[0][i].pos_x][rpoint[0][i].pos_y] !=1 && rpoint[0][i].pos_x+1 < SCENE_W;
         if(temp_flag){              //执行下移动作
             clear(x,y,tx_code[tx][temp_tx]);change(x+1,y,tx_code[tx][temp_tx],2);
         }else{
@@ -166,18 +200,18 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
 
                         /*******/ //难度判定与处理
                         if(!uselevel[5]) { //开始难度判定
-                            if(!uselevel[5]&&score>=30 * SCENE_H) {
+                            if(!uselevel[5]&&score>=50 * SCENE_H) {
                                 SetLevel(5);
                                 ui->label_3->setText(tr("Level :  6"));
                                 uselevel[5] = true;
                             }
-                            else if(!uselevel[4]&&score>=20 * SCENE_H) {
+                            else if(!uselevel[4]&&score>=32 * SCENE_H) {
                                 SetLevel(4);
                                 SetSpeed(4);
                                 ui->label_3->setText(tr("Level :  5"));
                                 uselevel[4] = true;
                             }
-                            else if(!uselevel[3]&&score>=11 * SCENE_H) {
+                            else if(!uselevel[3]&&score>=15 * SCENE_H) {
                                 SetLevel(3);
                                 SetSpeed(3);
                                 ui->label_3->setText(tr("Level :  4"));
@@ -227,44 +261,44 @@ void MainWindow::weizhi(int x,int y,int tx,direction direct)
             }
             */
             //重新构造一个方块
-            rpoint[0].pos_x = 1;rpoint[0].pos_y = SCENE_H/2;//设置主方块位置信息
+            rpoint[0][0].pos_x = 1;rpoint[0][0].pos_y = SCENE_H/2;//设置主方块位置信息
             REC_tx[0]=REC_tx[1];//随机出现第一个图形
             REC_tx[1] = rand()%7;
-            change(rpoint[0].pos_x,rpoint[0].pos_y,tx_code[REC_tx[0]][0],2);
+            change(rpoint[0][0].pos_x,rpoint[0][0].pos_y,tx_code[REC_tx[0]][0],2);
             temp_tx = 0;
         }
         break;
 
     case LEFT://左移
         for(int i=0;i<4;i++)        //判断是否允许左移
-            temp_flag = temp_flag && scene_num[rpoint[i].pos_x][rpoint[i].pos_y-1] !=1 && rpoint[i].pos_y-1 >=0;
+            temp_flag = temp_flag && scene_num[rpoint[0][i].pos_x][rpoint[0][i].pos_y-1] !=1 && rpoint[0][i].pos_y-1 >=0;
         if(temp_flag){              //执行左移动作
         clear(x,y,tx_code[tx][temp_tx]);change(x,y-1,tx_code[tx][temp_tx],2);
         }break;
 
     case RIGHT://右移
         for(int i=0;i<4;i++)        //判断是否允许右移
-            temp_flag = temp_flag && scene_num[rpoint[i].pos_x][rpoint[i].pos_y+1] !=1 && rpoint[i].pos_y+1 < SCENE_H;
+            temp_flag = temp_flag && scene_num[rpoint[0][i].pos_x][rpoint[0][i].pos_y+1] !=1 && rpoint[0][i].pos_y+1 < SCENE_H;
         if(temp_flag){              //执行右移动作
         clear(x,y,tx_code[tx][temp_tx]);change(x,y+1,tx_code[tx][temp_tx],2);
         }break;
 
     case SPACE://快速下移
-        int tempx;
+        //int tempx;
         for(int j=0;j<SCENE_W;j++){
             for(int i=0;i<4;i++)        //判断是否允许下移
-                temp_flag = temp_flag && scene_num[rpoint[i].pos_x+1][rpoint[i].pos_y] !=1 &&
-                            scene_num[rpoint[i].pos_x][rpoint[i].pos_y] !=1 &&
-                        rpoint[i].pos_x+1 < SCENE_W;
+                temp_flag = temp_flag && scene_num[rpoint[0][i].pos_x+1][rpoint[0][i].pos_y] !=1 &&
+                            scene_num[rpoint[0][i].pos_x][rpoint[0][i].pos_y] !=1 &&
+                        rpoint[0][i].pos_x+1 < SCENE_W;
             if(temp_flag){              //执行下移动作
                 clear(x+j,y,tx_code[tx][temp_tx]);
                 change(x+j+1,y,tx_code[tx][temp_tx],2);
                 //change(x+j+1,y,tx_code[tx][temp_tx],1);
-                tempx = x+j+1;
+                //tempx = x+j+1;
             }else break;
         }
         //落下后更改状态为静止
-        change(tempx,y,tx_code[tx][temp_tx],1);
+        //change(tempx,y,tx_code[tx][temp_tx],1);
         break;
     }
 }
@@ -275,12 +309,11 @@ void MainWindow::paintEvent(QPaintEvent */*event*/)
     QPainter painter(this);
     //刷新舞台
     for(int i=0;i<SCENE_W;i++){
-        for(int j=0;j<SCENE_H+5;j++){
-            if(scene_num[i][j] == 1){
+        for(int j=0;j<SCENE_H;j++){
+            if(scene_num[i][j] == 1) {
                 painter.setBrush(QBrush(color2,Qt::SolidPattern));
                 painter.drawRect(j*REC_SIZE,i*REC_SIZE,REC_SIZE,REC_SIZE);
-            }
-            else if(scene_num[i][j] > 1){
+            } else if(scene_num[i][j] == 2){
                 painter.setBrush(QBrush(color1,Qt::SolidPattern));
                 painter.drawRect(j*REC_SIZE,i*REC_SIZE,REC_SIZE,REC_SIZE);
             }
@@ -291,7 +324,7 @@ void MainWindow::paintEvent(QPaintEvent */*event*/)
 void MainWindow::timerEvent(QTimerEvent *event)
 {
     if(!Pauseflag && timerid1==event->timerId()){
-        weizhi(rpoint[0].pos_x,rpoint[0].pos_y,REC_tx[0],DOWN);//下移
+        weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],DOWN);//下移
         //ui->scoreLCD->display(score);
     }
     if(!Pauseflag && timerid2==event->timerId())  this->update(); //刷新绘图
@@ -302,15 +335,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event)  //键盘事件
     if(!Pauseflag)
         switch(event->key()){
         case Qt::Key_Up:        //按下方向键上时
-            weizhi(rpoint[0].pos_x,rpoint[0].pos_y,REC_tx[0],UP);break;
+            weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],UP);break;
         case Qt::Key_Down:        //按下方向键下时
-            weizhi(rpoint[0].pos_x,rpoint[0].pos_y,REC_tx[0],DOWN);break;
+            weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],DOWN);break;
         case Qt::Key_Left:        //按下方向键左时
-            weizhi(rpoint[0].pos_x,rpoint[0].pos_y,REC_tx[0],LEFT);break;
+            weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],LEFT);break;
         case Qt::Key_Right:        //按下方向键右时
-            weizhi(rpoint[0].pos_x,rpoint[0].pos_y,REC_tx[0],RIGHT);break;
+            weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],RIGHT);break;
         case Qt::Key_Space:     //快速下移
-            weizhi(rpoint[0].pos_x,rpoint[0].pos_y,REC_tx[0],SPACE);break;
+            weizhi(rpoint[0][0].pos_x,rpoint[0][0].pos_y,REC_tx[0],SPACE);break;
         }
 }
 

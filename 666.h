@@ -42,6 +42,7 @@ public:
     ~MainWindow(); //析构函数
     void weizhi(int x,int y,int tx,direction direct); //位置变换
     void paintEvent(QPaintEvent *);  //场景绘制
+    void trychange(int x,int y,int num,REC_Point temppoint[4]);
     void change(int x,int y,int num,int state);     //方块变换
     void clear(int x,int y,int num);        //清除当前位置信息
     void move(int hang,direction direct);//部分移动
@@ -89,8 +90,8 @@ private:
     int SCENE_W;  //场景列数
     int REC_SIZE; //方块大小
     int scene_num[1007][1007];//场景数据
-    REC_Point rpoint[4]; //定义四个方块的位置
-    int REC_tx[2];//定义方块的图形
+    REC_Point rpoint[2][4]; //定义四个方块的位置
+    int REC_tx[4];//定义方块的图形
     int timerid1,timerid2;//记录两个定时器id
     int speed_ms,fresh_ms;//speed_ms记录下落速度,fresh_ms设置窗体刷新速度
     int score;//分数
