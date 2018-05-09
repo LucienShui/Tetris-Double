@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     memset(scene_num,0,sizeof(scene_num));
     db.createConnection();
     db.createTable();
+    db.queryAll();
 }
 
 MainWindow::~MainWindow()
